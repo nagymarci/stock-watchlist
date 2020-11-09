@@ -13,17 +13,21 @@ import (
 	"github.com/nagymarci/stock-watchlist/model"
 	"github.com/nagymarci/stock-watchlist/service"
 
+	stockHttp "github.com/nagymarci/stock-commons/http"
 	userprofileModel "github.com/nagymarci/stock-user-profile/model"
 )
 
 type WatchlistController struct {
-	watchlists   database.WatchlistCollection
-	stockService service.Stock
+	watchlists        *database.Watchlists
+	stockClient       *api.StockClient
+	userprofileClient *api.UserprofileClient
+	stockService      *service.StockService
 }
 
-func NewWatchlistController(w database.WatchlistCollection) *WatchlistController {
+func NewWatchlistController(w *database.Watchlists, sc *api.StockClient) *WatchlistController {
 	return &WatchlistController{
-		watchlists: w,
+		watchlists:  w,
+		stockClient: sc,
 	}
 }
 
@@ -32,10 +36,10 @@ func (wl *WatchlistController) Create(log *logrus.Logger, request *model.Watchli
 	var addedStocks []string
 
 	for _, symbol := range request.Stocks {
-		err := stockService.SaveStock(symbol)
+		err := wl.stockClient.RegisterStock(symbol)
 
 		if err != nil {
-			log.Warnln(err)
+			log.WithField("symbol", symbol).Warnln(err)
 			continue
 		}
 
@@ -46,7 +50,7 @@ func (wl *WatchlistController) Create(log *logrus.Logger, request *model.Watchli
 	id, err := wl.watchlists.Create(*request)
 
 	if err != nil {
-		return nil, model.NewInternalServerError(err.Error())
+		return nil, stockHttp.NewInternalServerError(err.Error())
 	}
 
 	watchlistResponse := model.Watchlist{
@@ -63,17 +67,17 @@ func (wl *WatchlistController) Delete(log *logrus.Logger, id primitive.ObjectID,
 	_, err := wl.getAndValidateUserAuthorization(id, userID)
 
 	if err != nil {
-		return model.NewBadRequestError(err.Error())
+		return stockHttp.NewBadRequestError(err.Error())
 	}
 
 	result, err := wl.watchlists.Delete(id)
 
 	if result != 1 {
-		return model.NewInternalServerError("No object were removed from database")
+		return stockHttp.NewInternalServerError("No object were removed from database")
 	}
 
 	if err != nil {
-		return model.NewInternalServerError(err.Error())
+		return stockHttp.NewInternalServerError(err.Error())
 	}
 
 	return nil
@@ -85,7 +89,7 @@ func (wl *WatchlistController) Get(log *logrus.Logger, id primitive.ObjectID, us
 	if err != nil {
 		message := "Cannot read watchlist " + err.Error()
 		log.Errorln(message)
-		return model.Watchlist{}, model.NewBadRequestError(message)
+		return model.Watchlist{}, stockHttp.NewBadRequestError(message)
 	}
 
 	return watchlist, nil
@@ -97,7 +101,7 @@ func (wl *WatchlistController) GetAll(log *logrus.Logger, userID string) ([]mode
 	if err != nil {
 		message := "Unable to list watchlists " + err.Error()
 		log.Errorln(message)
-		return nil, model.NewBadRequestError(message)
+		return nil, stockHttp.NewBadRequestError(message)
 	}
 
 	return watchlists, nil
@@ -109,32 +113,33 @@ func (wl *WatchlistController) GetCalculated(log *logrus.Logger, id primitive.Ob
 	if err != nil {
 		message := "Cannot read watchlist " + err.Error()
 		log.Errorln(message)
-		return nil, model.NewBadRequestError(message)
+		return nil, stockHttp.NewBadRequestError(message)
 	}
 
 	var stockInfos []model.CalculatedStockInfo
 
-	userprofile, err := api.GetUserprofile(userID)
+	userprofile, err := wl.userprofileClient.GetUserprofile(userID)
 
 	if err != nil {
 		log.Errorln(err)
 		defaultExpectation := 9.0
-		userprofile = userprofileModel.Userprofile{DefaultExpectation: &defaultExpectation}
+		defaultExpectedReturn := 9.0
+		userprofile = userprofileModel.Userprofile{DefaultExpectation: &defaultExpectation, ExpectedReturn: &defaultExpectedReturn}
 	}
 
 	for _, symbol := range watchlist.Stocks {
-		result, err := database.Get(symbol)
+		result, err := wl.stockClient.Get(symbol)
 
 		if err != nil {
-			log.Printf("Failed to get stock [%s]: [%v]\n", symbol, err)
+			log.Warnf("Failed to get stock [%s]: [%v]\n", symbol, err)
 			continue
 		}
 
 		expectation := userprofile.GetExpectation(symbol)
 
-		log.Printf("Symbol [%s] expectation [%f]", symbol, expectation)
+		log.Debugf("Symbol [%s] expectation [%f]\n", symbol, expectation)
 
-		calculatedStockInfo := service.Calculate(&result, expectation)
+		calculatedStockInfo := wl.stockService.Calculate(&result, expectation, *userprofile.ExpectedReturn)
 
 		stockInfos = append(stockInfos, calculatedStockInfo)
 	}
@@ -148,27 +153,9 @@ func (w *WatchlistController) getAndValidateUserAuthorization(id primitive.Objec
 		return watchlist, err
 	}
 
-	if watchlist.userID != userID {
+	if watchlist.UserID != userID {
 		return watchlist, errors.New("Watchlist does not belong to user")
 	}
 
 	return watchlist, err
-}
-
-func saveStock(stock string) error {
-	_, err := database.Get(stock)
-
-	if err == nil {
-		return err
-	}
-
-	stockData, err := service.Get(stock)
-
-	if err != nil {
-		return err
-	}
-
-	err = database.Save(stockData)
-
-	return err
 }

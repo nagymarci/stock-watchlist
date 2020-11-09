@@ -18,7 +18,7 @@ func WatchlistCreateHandler(mux *mux.Router, watchlist *controllers.WatchlistCon
 	mux.HandleFunc("", func(w http.ResponseWriter, r *http.Request) {
 		userID := extractUserID(r)
 
-		log := logrus.WithFields(logrus.Fields("userId": userID, "requestId": GetRequestId(r)))
+		log := logrus.WithFields(logrus.Fields{"userId": userID, "requestId": reqid.GetRequestId(r)})
 
 		var watchlistRequest *model.WatchlistRequest
 
@@ -47,7 +47,7 @@ func WatchlistCreateHandler(mux *mux.Router, watchlist *controllers.WatchlistCon
 
 		watchlistRequest.UserID = userID
 
-		result, err := watchlist.Create(log, watchlistRequest)
+		result, err := watchlist.Create(log.Logger, watchlistRequest)
 
 		if err != nil {
 			message := "Watchlist creation failed: " + err.Error()
@@ -66,7 +66,7 @@ func WatchlistDeleteHandler(router *mux.Router, watchlist *controllers.Watchlist
 		userID := extractUserID(r)
 		watchlistID, err := extractWatchlistID(r)
 
-		log := logrus.WithFields(logrus.Fields("userId": userID, "requestId": GetRequestId(r), "watchlistId": watchlistID))
+		log := logrus.WithFields(logrus.Fields{"userId": userID, "requestId": reqid.GetRequestId(r), "watchlistId": watchlistID})
 
 		if err != nil {
 			log.Errorln(err)
@@ -74,7 +74,7 @@ func WatchlistDeleteHandler(router *mux.Router, watchlist *controllers.Watchlist
 			return
 		}
 
-		err = watchlist.Delete(log, id, userID)
+		err = watchlist.Delete(log.Logger, watchlistID, userID)
 
 		if err != nil {
 			log.Errorln(err)
@@ -90,17 +90,17 @@ func WatchlistGetAllHandler(router *mux.Router, watchlist *controllers.Watchlist
 	router.HandleFunc("", func(w http.ResponseWriter, r *http.Request) {
 		userID := extractUserID(r)
 
-		log := logrus.WithFields(logrus.Fields("userId": userID, "requestId": GetRequestId(r)))
+		log := logrus.WithFields(logrus.Fields{"userId": userID, "requestId": reqid.GetRequestId(r)})
 
-		result, err := watchlist.GetAll(log, userID)
+		result, err := watchlist.GetAll(log.Logger, userID)
 
 		if err != nil {
 			log.Errorln(err)
-			handleError(err, w)
+			stockHttp.HandleError(err, w)
 			return
 		}
 
-		handleJSONResponse(result, w, http.StatusOK)
+		stockHttp.HandleJSONResponse(result, w, http.StatusOK)
 	}).Methods(http.MethodGet)
 }
 
@@ -109,7 +109,7 @@ func WatchlistGetHandler(router *mux.Router, watchlist *controllers.WatchlistCon
 		userID := extractUserID(r)
 		watchlistID, err := extractWatchlistID(r)
 
-		log := logrus.WithFields(logrus.Fields("userId": userID, "requestId": GetRequestId(r), "watchlistId": watchlistID))
+		log := logrus.WithFields(logrus.Fields{"userId": userID, "requestId": reqid.GetRequestId(r), "watchlistId": watchlistID})
 
 		if err != nil {
 			log.Errorln(err)
@@ -117,7 +117,7 @@ func WatchlistGetHandler(router *mux.Router, watchlist *controllers.WatchlistCon
 			return
 		}
 
-		result, err := watchlist.Get(log, id, userID)
+		result, err := watchlist.Get(log.Logger, watchlistID, userID)
 
 		if err != nil {
 			log.Errorln(err)
@@ -125,7 +125,7 @@ func WatchlistGetHandler(router *mux.Router, watchlist *controllers.WatchlistCon
 			return
 		}
 
-		handleJSONResponse(result, w, http.StatusOK)
+		stockHttp.HandleJSONResponse(result, w, http.StatusOK)
 	}).Methods(http.MethodGet)
 }
 
@@ -134,7 +134,7 @@ func WatchlistGetCalculatedHandler(router *mux.Router, watchlist *controllers.Wa
 		userID := extractUserID(r)
 		watchlistID, err := extractWatchlistID(r)
 
-		log := logrus.WithFields(logrus.Fields("userId": userID, "requestId": GetRequestId(r), "watchlistId": watchlistID))
+		log := logrus.WithFields(logrus.Fields{"userId": userID, "requestId": reqid.GetRequestId(r), "watchlistId": watchlistID})
 
 		if err != nil {
 			log.Errorln(err)
@@ -142,7 +142,7 @@ func WatchlistGetCalculatedHandler(router *mux.Router, watchlist *controllers.Wa
 			return
 		}
 
-		result, err := watchlist.GetCalculated(log, id, userID)
+		result, err := watchlist.GetCalculated(log.Logger, watchlistID, userID)
 
 		if err != nil {
 			log.Errorln(err)
@@ -150,7 +150,7 @@ func WatchlistGetCalculatedHandler(router *mux.Router, watchlist *controllers.Wa
 			return
 		}
 
-		handleJSONResponse(result, w, http.StatusOK)
+		stockHttp.HandleJSONResponse(result, w, http.StatusOK)
 	}).Methods(http.MethodGet)
 }
 
@@ -160,7 +160,7 @@ func extractWatchlistID(r *http.Request) (primitive.ObjectID, error) {
 
 	if err != nil {
 		message := "Invalid watchlist id: " + err.Error()
-		return primitive.NilObjectID, model.NewBadRequestError(message)
+		return primitive.NilObjectID, stockHttp.NewBadRequestError(message)
 	}
 
 	return objectID, nil
