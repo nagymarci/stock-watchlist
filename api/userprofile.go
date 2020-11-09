@@ -4,15 +4,22 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 
 	userprofileModel "github.com/nagymarci/stock-user-profile/model"
 )
 
-func GetUserprofile(userId string) (userprofileModel.Userprofile, error) {
-	host := os.Getenv("HOST_USERPROFILE")
+type UserprofileClient struct {
+	host string
+}
 
-	resp, err := http.Get(host + userId)
+func NewUserprofileClient(h string) *UserprofileClient {
+	return &UserprofileClient{
+		host: h,
+	}
+}
+
+func (uc *UserprofileClient) GetUserprofile(userId string) (userprofileModel.Userprofile, error) {
+	resp, err := http.Get(uc.host + userId)
 
 	if err != nil {
 		return userprofileModel.Userprofile{}, fmt.Errorf("Failed to get userprofile [%s] with error [%v]", userId, err)
