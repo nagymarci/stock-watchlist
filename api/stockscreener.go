@@ -76,7 +76,7 @@ type sp500DivYield struct {
 //Sp500DivYield stores information of the S&P500 dividend yield, and when we should update it next
 var sp500 sp500DivYield
 
-//TODO move this logic to stoc-screener service
+//TODO move this logic to stock-screener service
 func (sc *StockClient) GetSP500DivYield() float64 {
 	now := time.Now()
 	if sp500.NextUpdate.Before(now) {
@@ -84,12 +84,11 @@ func (sc *StockClient) GetSP500DivYield() float64 {
 		sp500.Mux.Lock()
 		log.Println("After lock")
 
+		defer sp500.Mux.Unlock()
+
 		if sp500.NextUpdate.Before(now) {
 			yield, err := getSp500DivYield()
 			if err != nil {
-				log.Println("Before unlock in error")
-				sp500.Mux.Unlock()
-				log.Println("After unlock in error")
 				log.Printf("Failed to update sp500 dividend yield: [%v]\n", err)
 				log.Println("Using old sp500 dividend yield")
 
@@ -100,9 +99,6 @@ func (sc *StockClient) GetSP500DivYield() float64 {
 				}
 				sp500.Yield = yield
 				sp500.NextUpdate = now.Add(nextUpdateInterval)
-				log.Println("Before unlock in happy")
-				sp500.Mux.Unlock()
-				log.Println("After unlock in happy")
 				log.Println("SP500 dividend yield updated")
 			}
 		}

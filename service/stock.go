@@ -3,26 +3,36 @@ package service
 import (
 	"math"
 
-	"github.com/nagymarci/stock-watchlist/api"
 	"github.com/nagymarci/stock-watchlist/model"
 )
 
-type StockService struct {
-	stockClient *api.StockClient
+type sP500Client interface {
+	GetSP500DivYield() float64
+}
+
+type stockService struct {
+	sp500Client sP500Client
+}
+
+func NewStockService(s sP500Client) *stockService {
+	return &stockService{
+		sp500Client: s,
+	}
 }
 
 const (
 	defaultDividendPerYear       float64 = 4
+	monthlyDividendPerYear       float64 = 12
 	lowerDividendYieldGuardScore float64 = 1.5
 	maxOptInPeWeight             float64 = 0.5
 	minOptInYieldWeight          float64 = 0.4
 )
 
 //Calculate returns the dynamically computed data from the latest information
-func (ss *StockService) Calculate(stockInfo *model.StockData, expectedRaise float64, expectedReturn float64) model.CalculatedStockInfo {
+func (ss *stockService) Calculate(stockInfo *model.StockData, expectedRaise float64, expectedReturn float64) model.CalculatedStockInfo {
 	var result model.CalculatedStockInfo
 
-	sp500DivYield := ss.stockClient.GetSP500DivYield()
+	sp500DivYield := ss.sp500Client.GetSP500DivYield()
 
 	minYieldFromExpRaise := expectedReturn - expectedRaise
 	if minYieldFromExpRaise <= 0.0 {
@@ -35,8 +45,10 @@ func (ss *StockService) Calculate(stockInfo *model.StockData, expectedRaise floa
 
 	result.Ticker = stockInfo.Ticker
 	result.AnnualDividend = stockInfo.Dividend * defaultDividendPerYear
+
+	//TODO store this in DB with the other info for the given stock
 	if result.Ticker == "O" {
-		result.AnnualDividend = stockInfo.Dividend * 12
+		result.AnnualDividend = stockInfo.Dividend * monthlyDividendPerYear
 	}
 	result.Price = stockInfo.Price
 	result.DividendYield = result.AnnualDividend / result.Price * 100
