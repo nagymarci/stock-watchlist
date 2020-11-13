@@ -67,3 +67,20 @@ func (w *Watchlists) GetAll(userID string) ([]model.Watchlist, error) {
 
 	return result, err
 }
+
+func (w *Watchlists) List() ([]model.Watchlist, error) {
+	cursor, err := w.collection.Find(context.TODO(), bson.M{})
+
+	if err != nil {
+		return nil, err
+	}
+
+	var result []model.Watchlist
+	for cursor.Next(context.TODO()) {
+		var data model.Watchlist
+		cursor.Decode(&data)
+		result = append(result, data)
+	}
+
+	return result, err
+}

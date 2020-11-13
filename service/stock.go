@@ -3,6 +3,7 @@ package service
 import (
 	"math"
 
+	userprofileModel "github.com/nagymarci/stock-user-profile/model"
 	"github.com/nagymarci/stock-watchlist/model"
 )
 
@@ -122,4 +123,38 @@ func calculateOptInYield(max float64, avg float64, sp float64, exp float64) (flo
 
 func calculateMinOptInYield(max float64, avg float64) float64 {
 	return (max-avg)*minOptInYieldWeight + avg
+}
+
+//GetAllRecommendedStock returns all the recommended stocks based on the requirements
+func (ss *StockService) GetAllRecommendedStock(stocks []model.StockData, numReqs int, userprofile *userprofileModel.Userprofile) []model.CalculatedStockInfo {
+	var result []model.CalculatedStockInfo
+
+	for _, stockInfo := range stocks {
+		calculated := ss.Calculate(&stockInfo, userprofile.GetExpectation(stockInfo.Ticker), *userprofile.ExpectedReturn)
+
+		reqsFulfilled := calculateReqsFulfilled(&calculated)
+
+		if reqsFulfilled >= numReqs {
+			result = append(result, calculated)
+		}
+	}
+
+	return result
+}
+
+func calculateReqsFulfilled(stock *model.CalculatedStockInfo) int {
+	result := 0
+	if stock.DividendColor == "green" {
+		result++
+	}
+
+	if stock.PriceColor == "green" {
+		result++
+	}
+
+	if stock.PeColor == "green" {
+		result++
+	}
+
+	return result
 }
