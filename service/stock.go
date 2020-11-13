@@ -10,12 +10,12 @@ type sP500Client interface {
 	GetSP500DivYield() float64
 }
 
-type stockService struct {
+type StockService struct {
 	sp500Client sP500Client
 }
 
-func NewStockService(s sP500Client) *stockService {
-	return &stockService{
+func NewStockService(s sP500Client) *StockService {
+	return &StockService{
 		sp500Client: s,
 	}
 }
@@ -29,7 +29,7 @@ const (
 )
 
 //Calculate returns the dynamically computed data from the latest information
-func (ss *stockService) Calculate(stockInfo *model.StockData, expectedRaise float64, expectedReturn float64) model.CalculatedStockInfo {
+func (ss *StockService) Calculate(stockInfo *model.StockData, expectedRaise float64, expectedReturn float64) model.CalculatedStockInfo {
 	var result model.CalculatedStockInfo
 
 	sp500DivYield := ss.sp500Client.GetSP500DivYield()
