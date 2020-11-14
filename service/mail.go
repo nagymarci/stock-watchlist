@@ -19,7 +19,7 @@ func (s *smtpServer) Address() string {
 
 type mail struct{}
 
-func (m *mail) sendNotification(profileName string, removed, added, currentStocks []string, email string) error {
+func (m *mail) SendNotification(profileName string, removed, added, currentStocks []string, email string) error {
 	// Sender data.
 	from := os.Getenv("SMPT_SENDER_USERNAME")
 	password := os.Getenv("SMPT_SENDER_PASSWORD")

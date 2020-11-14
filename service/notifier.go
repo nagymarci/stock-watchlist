@@ -27,7 +27,7 @@ type recommendationProvider interface {
 }
 
 type emailSender interface {
-	sendNotification(profileName string, removed, added, currentStocks []string, email string) error
+	SendNotification(profileName string, removed, added, currentStocks []string, email string) error
 }
 
 type stockGetter interface {
@@ -95,7 +95,7 @@ func (n *Notifier) NotifyChanges() {
 			continue
 		}
 
-		err = n.emailClient.sendNotification(watchlist.Name, removed, added, currentStocks, userprofile.Email)
+		err = n.emailClient.SendNotification(watchlist.Name, removed, added, currentStocks, userprofile.Email)
 
 		if err != nil {
 			log.Errorln("Failed to send notification ", err)
