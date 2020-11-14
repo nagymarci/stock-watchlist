@@ -32,11 +32,11 @@ jobs:
             dep ensure
         fi
 
+    - name: Generate
+      run: go generate -v ./...
+
     - name: Build
       run: go build -v ./...
-
-    - name: Generate mocks
-      run: cd service && mockgen  -source=notifier.go -destination=mocks/mock_notifier-deps.go -package=mocks
 
     - name: Test
       run: go test -v ./...

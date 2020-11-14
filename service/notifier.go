@@ -1,5 +1,6 @@
 package service
 
+//go:generate $GOPATH/bin/mockgen -source=notifier.go -destination=mocks/mock_notifier-deps.go -package=mocks
 import (
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson/primitive"
