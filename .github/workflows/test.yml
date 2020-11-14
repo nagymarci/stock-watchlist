@@ -22,7 +22,7 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Get mockgen
-      run: GO111MODULE=on go get github.com/golang/mock/mockgen@1.4.4
+      run: GO111MODULE=on go get github.com/golang/mock/mockgen@v1.4.4
 
     - name: Get dependencies
       run: |
