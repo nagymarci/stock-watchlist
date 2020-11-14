@@ -1,4 +1,4 @@
-name: Test
+name: Build & Test
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
 jobs:
 
   build:
-    name: Tests
+    name: Build & run tests
     runs-on: ubuntu-latest
     steps:
 
@@ -31,6 +31,9 @@ jobs:
             curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
             dep ensure
         fi
+
+    - name: Build
+      run: go build -v ./...
 
     - name: Generate mocks
       run: cd service && mockgen  -source=notifier.go -destination=mocks/mock_notifier-deps.go -package=mocks
