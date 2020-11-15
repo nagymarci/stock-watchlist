@@ -19,12 +19,17 @@ import (
 
 type WatchlistController struct {
 	watchlists        *database.Watchlists
-	stockClient       *api.StockClient
+	stockClient       stockClient
 	userprofileClient *api.UserprofileClient
 	stockService      *service.StockService
 }
 
-func NewWatchlistController(w *database.Watchlists, sc *api.StockClient) *WatchlistController {
+type stockClient interface {
+	RegisterStock(symbol string) error
+	Get(symbol string) (model.StockData, error)
+}
+
+func NewWatchlistController(w *database.Watchlists, sc stockClient) *WatchlistController {
 	return &WatchlistController{
 		watchlists:  w,
 		stockClient: sc,
