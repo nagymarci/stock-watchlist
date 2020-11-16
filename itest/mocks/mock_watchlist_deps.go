@@ -5,9 +5,11 @@
 package mocks
 
 import (
-	gomock "github.com/golang/mock/gomock"
-	model "github.com/nagymarci/stock-watchlist/model"
 	reflect "reflect"
+
+	gomock "github.com/golang/mock/gomock"
+	model "github.com/nagymarci/stock-user-profile/model"
+	model0 "github.com/nagymarci/stock-watchlist/model"
 )
 
 // MockstockClient is a mock of stockClient interface
@@ -48,10 +50,10 @@ func (mr *MockstockClientMockRecorder) RegisterStock(symbol interface{}) *gomock
 }
 
 // Get mocks base method
-func (m *MockstockClient) Get(symbol string) (model.StockData, error) {
+func (m *MockstockClient) Get(symbol string) (model0.StockData, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Get", symbol)
-	ret0, _ := ret[0].(model.StockData)
+	ret0, _ := ret[0].(model0.StockData)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -60,4 +62,42 @@ func (m *MockstockClient) Get(symbol string) (model.StockData, error) {
 func (mr *MockstockClientMockRecorder) Get(symbol interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockstockClient)(nil).Get), symbol)
+}
+
+// MockuserprofileClient is a mock of userprofileClient interface
+type MockuserprofileClient struct {
+	ctrl     *gomock.Controller
+	recorder *MockuserprofileClientMockRecorder
+}
+
+// MockuserprofileClientMockRecorder is the mock recorder for MockuserprofileClient
+type MockuserprofileClientMockRecorder struct {
+	mock *MockuserprofileClient
+}
+
+// NewMockuserprofileClient creates a new mock instance
+func NewMockuserprofileClient(ctrl *gomock.Controller) *MockuserprofileClient {
+	mock := &MockuserprofileClient{ctrl: ctrl}
+	mock.recorder = &MockuserprofileClientMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use
+func (m *MockuserprofileClient) EXPECT() *MockuserprofileClientMockRecorder {
+	return m.recorder
+}
+
+// GetUserprofile mocks base method
+func (m *MockuserprofileClient) GetUserprofile(userId string) (model.Userprofile, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserprofile", userId)
+	ret0, _ := ret[0].(model.Userprofile)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUserprofile indicates an expected call of GetUserprofile
+func (mr *MockuserprofileClientMockRecorder) GetUserprofile(userId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserprofile", reflect.TypeOf((*MockuserprofileClient)(nil).GetUserprofile), userId)
 }
