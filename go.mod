@@ -9,7 +9,9 @@ require (
 	github.com/nagymarci/stock-commons v1.2.0
 	github.com/nagymarci/stock-screener v0.0.0-20201031104124-6f9cd3c8ad94
 	github.com/nagymarci/stock-user-profile v1.2.2
+	github.com/robfig/cron/v3 v3.0.0
 	github.com/sirupsen/logrus v1.7.0
 	github.com/testcontainers/testcontainers-go v0.9.0
+	github.com/urfave/negroni v1.0.0
 	go.mongodb.org/mongo-driver v1.4.2
 )
