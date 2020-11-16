@@ -27,6 +27,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -395,7 +396,7 @@ func TestWatchlistGetCalculatedHandler(t *testing.T) {
 }
 
 func cleanup() {
-	collections, _ := db.ListCollectionNames()
+	collections, _ := db.ListCollectionNames(context.TODO(), bson.D{})
 	for _, collection := range collections {
 		db.Collection(collection).Drop(context.TODO())
 	}
