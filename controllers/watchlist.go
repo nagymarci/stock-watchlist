@@ -3,7 +3,6 @@ package controllers
 import (
 	"errors"
 
-	"github.com/nagymarci/stock-watchlist/api"
 	"github.com/sirupsen/logrus"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -19,15 +18,26 @@ import (
 
 type WatchlistController struct {
 	watchlists        *database.Watchlists
-	stockClient       *api.StockClient
-	userprofileClient *api.UserprofileClient
+	stockClient       stockClient
+	userprofileClient userprofileClient
 	stockService      *service.StockService
 }
 
-func NewWatchlistController(w *database.Watchlists, sc *api.StockClient) *WatchlistController {
+type stockClient interface {
+	RegisterStock(symbol string) error
+	Get(symbol string) (model.StockData, error)
+}
+
+type userprofileClient interface {
+	GetUserprofile(userId string) (userprofileModel.Userprofile, error)
+}
+
+func NewWatchlistController(w *database.Watchlists, sc stockClient, upc userprofileClient, ss *service.StockService) *WatchlistController {
 	return &WatchlistController{
-		watchlists:  w,
-		stockClient: sc,
+		watchlists:        w,
+		stockClient:       sc,
+		userprofileClient: upc,
+		stockService:      ss,
 	}
 }
 
