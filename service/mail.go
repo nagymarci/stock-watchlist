@@ -19,6 +19,10 @@ func (s *smtpServer) Address() string {
 
 type mail struct{}
 
+func NewMail() *mail {
+	return &mail{}
+}
+
 func (m *mail) SendNotification(profileName string, removed, added, currentStocks []string, email string) error {
 	// Sender data.
 	from := os.Getenv("SMPT_SENDER_USERNAME")
