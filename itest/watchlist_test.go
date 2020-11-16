@@ -86,6 +86,7 @@ func TestWatchlistCreateHandler(t *testing.T) {
 	t.Run("sends 201Created with data saved to db", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
+		defer cleanup()
 
 		wlDb := database.NewWatchlists(db)
 		stockClient := mocks.NewMockstockClient(ctrl)
@@ -131,6 +132,7 @@ func TestWatchlistCreateHandler(t *testing.T) {
 	t.Run("saves watchlist to db", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
+		defer cleanup()
 
 		wlDb := database.NewWatchlists(db)
 		stockClient := mocks.NewMockstockClient(ctrl)
@@ -185,6 +187,7 @@ func TestWatchlistDeleteHandler(t *testing.T) {
 	t.Run("deletes watchlist from db", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
+		defer cleanup()
 
 		wlDb := database.NewWatchlists(db)
 		watchlistRequest := model.WatchlistRequest{Name: "name", Stocks: []string{"INTC"}, UserID: "userId"}
@@ -221,6 +224,7 @@ func TestWatchlistGetAllHandler(t *testing.T) {
 	t.Run("returns the watchlists of the user", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
+		defer cleanup()
 
 		wlDb := database.NewWatchlists(db)
 		watchlistRequest1 := model.WatchlistRequest{Name: "name", Stocks: []string{"INTC"}, UserID: "userId"}
@@ -267,6 +271,7 @@ func TestWatchlistGetHandler(t *testing.T) {
 	t.Run("returns the given watchlist of the user", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
+		defer cleanup()
 
 		wlDb := database.NewWatchlists(db)
 		watchlistRequest1 := model.WatchlistRequest{Name: "name", Stocks: []string{"INTC"}, UserID: "userId"}
@@ -317,6 +322,7 @@ func TestWatchlistGetCalculatedHandler(t *testing.T) {
 	t.Run("returns the given calculated watchlist of the user", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
+		defer cleanup()
 
 		wlDb := database.NewWatchlists(db)
 		watchlistRequest1 := model.WatchlistRequest{Name: "name", Stocks: []string{"INTC", "XOM"}, UserID: "userId"}
@@ -386,4 +392,11 @@ func TestWatchlistGetCalculatedHandler(t *testing.T) {
 			t.Fatalf("expected [%v], got [%v]", expectedResultINTC, result)
 		}
 	})
+}
+
+func cleanup() {
+	collections, _ := db.ListCollectionNames()
+	for _, collection := range collections {
+		db.Collection(collection).Drop(context.TODO())
+	}
 }
