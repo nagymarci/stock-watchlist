@@ -32,7 +32,7 @@ func (sc *StockClient) RegisterStock(symbol string) error {
 
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 299 {
+	if resp.StatusCode >= 299 && resp.StatusCode != 304 {
 		var response string
 		fmt.Fscan(resp.Body, &response)
 		return fmt.Errorf("Failed to register [%s], status code [%d], response [%v]", symbol, resp.StatusCode, response)
