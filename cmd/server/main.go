@@ -28,8 +28,9 @@ func main() {
 	sS := service.NewStockService(sC)
 
 	wC := controllers.NewWatchlistController(wDb, sC, upC, sS)
+	stockController := controllers.NewStockController(sC, upC, sS)
 
-	router := routes.Route(wC)
+	router := routes.Route(wC, stockController)
 
 	mC := service.NewMail()
 	c := cron.New()

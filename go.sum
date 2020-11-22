@@ -130,6 +130,8 @@ github.com/nagymarci/stock-commons v1.1.0 h1:wChoygVVQwwxMTQ6kp7m9z5TPg1In5RRdW0
 github.com/nagymarci/stock-commons v1.1.0/go.mod h1:8zwuzEo4lAK12j4wNOeNT24cclFtyWi4UUTTS5Frw4U=
 github.com/nagymarci/stock-commons v1.2.0 h1:RV7wwGAG1XE7IAv7CI8WVayCBUzLvaTMkUSdIvnNBMI=
 github.com/nagymarci/stock-commons v1.2.0/go.mod h1:73FZHzxFHymv1TFmv4cawDI7qt8j7/CLyEoYz6EB19M=
+github.com/nagymarci/stock-commons v1.3.0 h1:9MfKS+5EW0UBK76ZdQEguHakA4z3MgTcycscRJMLB+Y=
+github.com/nagymarci/stock-commons v1.3.0/go.mod h1:73FZHzxFHymv1TFmv4cawDI7qt8j7/CLyEoYz6EB19M=
 github.com/nagymarci/stock-screener v0.0.0-20201031104124-6f9cd3c8ad94 h1:nzVoVN49+qTBgLeG4XQJdEt9R5RV5KgAOViIiLDPuOo=
 github.com/nagymarci/stock-screener v0.0.0-20201031104124-6f9cd3c8ad94/go.mod h1:teT5KkpFcpiHw/+fY+cBVsYj9K7c+anyGVSa9WE7xQo=
 github.com/nagymarci/stock-user-profile v1.2.1/go.mod h1:xdu8JrGVXo3VRVSytiCZN0RepmhKFSRk7LXAiSR5Saw=

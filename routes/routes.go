@@ -13,7 +13,7 @@ import (
 	"github.com/nagymarci/stock-watchlist/controllers"
 )
 
-func Route(watchlistController *controllers.WatchlistController) http.Handler {
+func Route(watchlistController *controllers.WatchlistController, stockController *controllers.StockController) http.Handler {
 	router := mux.NewRouter()
 	router.Use(corsMiddleware)
 
@@ -24,6 +24,9 @@ func Route(watchlistController *controllers.WatchlistController) http.Handler {
 	handlers.WatchlistGetHandler(watchlist, watchlistController, authorization.DefaultExtractUserID)
 	handlers.WatchlistGetCalculatedHandler(watchlist, watchlistController, authorization.DefaultExtractUserID)
 
+	all := mux.NewRouter().PathPrefix("/all").Subrouter()
+	handlers.StockGetAllCalculatedHandler(all, stockController)
+
 	audience := os.Getenv("WATCHLIST_AUDIENCE")
 	authServer := os.Getenv("AUTHORIZATION_SERVER")
 	watchlistScope := os.Getenv("WATCHLIST_SCOPE")
@@ -32,7 +35,10 @@ func Route(watchlistController *controllers.WatchlistController) http.Handler {
 		negroni.HandlerFunc(authorization.CreateAuthorizationMiddleware(audience, authServer).HandlerWithNext),
 		negroni.HandlerFunc(authorization.CreateScopeMiddleware(watchlistScope, authServer, audience)))
 
+	handlers.StockGetAllCalculatedForUserHandler(all, auth, stockController, authorization.DefaultExtractUserID)
+
 	router.PathPrefix("/watchlist").Handler(auth.With(negroni.Wrap(watchlist)))
+	router.PathPrefix("/all").Handler(all)
 
 	recovery := negroni.NewRecovery()
 	recovery.PrintStack = false

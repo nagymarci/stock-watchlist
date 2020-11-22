@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"sync"
 	"time"
 
@@ -67,6 +68,32 @@ func (sc *StockClient) Get(symbol string) (model.StockData, error) {
 	return stockData, nil
 }
 
+func (sc *StockClient) GetAll() ([]model.StockData, error) {
+	resp, err := http.Get(strings.Trim(sc.host, "/"))
+
+	if err != nil {
+		return nil, fmt.Errorf("Failed to get stocks, error [%v]", err)
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		var response string
+		fmt.Fscan(resp.Body, &response)
+		return nil, fmt.Errorf("Failed to get stocks, response code [%d], response [%v]", resp.StatusCode, response)
+	}
+
+	var result []model.StockData
+
+	err = json.NewDecoder(resp.Body).Decode(&result)
+
+	if err != nil {
+		return nil, fmt.Errorf("Failed to deserialize data, error: [%v]", err)
+	}
+
+	return result, nil
+}
+
 type sp500DivYield struct {
 	Yield      float64
 	NextUpdate time.Time
@@ -80,9 +107,7 @@ var sp500 sp500DivYield
 func (sc *StockClient) GetSP500DivYield() float64 {
 	now := time.Now()
 	if sp500.NextUpdate.Before(now) {
-		log.Println("Before lock")
 		sp500.Mux.Lock()
-		log.Println("After lock")
 
 		defer sp500.Mux.Unlock()
 
