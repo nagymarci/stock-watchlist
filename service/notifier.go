@@ -24,7 +24,7 @@ type watchlistList interface {
 
 type recommendationProvider interface {
 	Get(id primitive.ObjectID) ([]string, error)
-	Update(log *logrus.Logger, id primitive.ObjectID, stocks []string) error
+	Update(log *logrus.Entry, id primitive.ObjectID, stocks []string) error
 }
 
 type emailSender interface {
@@ -103,7 +103,7 @@ func (n *Notifier) NotifyChanges() {
 			continue
 		}
 
-		n.recommendations.Update(log.Logger, watchlist.ID, currentStocks)
+		n.recommendations.Update(log, watchlist.ID, currentStocks)
 	}
 }
 

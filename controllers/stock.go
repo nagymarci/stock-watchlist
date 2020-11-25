@@ -24,7 +24,7 @@ func NewStockController(sc *api.StockClient, upC *api.UserprofileClient, ss *ser
 	}
 }
 
-func (sc *StockController) GetAllCalculated(log *logrus.Logger, userID string) ([]model.CalculatedStockInfo, error) {
+func (sc *StockController) GetAllCalculated(log *logrus.Entry, userID string) ([]model.CalculatedStockInfo, error) {
 	stocks, err := sc.stockClient.GetAll()
 
 	if err != nil {

@@ -41,7 +41,7 @@ func (r *Recommendations) Get(id primitive.ObjectID) ([]string, error) {
 	return result.Stocks, err
 }
 
-func (r *Recommendations) Update(log *logrus.Logger, id primitive.ObjectID, stocks []string) error {
+func (r *Recommendations) Update(log *logrus.Entry, id primitive.ObjectID, stocks []string) error {
 	filter := bson.D{primitive.E{Key: "_id", Value: id}}
 	opts := options.Replace().SetUpsert(true)
 

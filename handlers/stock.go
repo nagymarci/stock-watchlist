@@ -15,7 +15,7 @@ func StockGetAllCalculatedHandler(mux *mux.Router, stockController *controllers.
 	mux.HandleFunc("", func(w http.ResponseWriter, r *http.Request) {
 		log := logrus.WithField("userId", "")
 
-		result, err := stockController.GetAllCalculated(log.Logger, "")
+		result, err := stockController.GetAllCalculated(log, "")
 
 		if err != nil {
 			stockHttp.HandleError(err, w)
@@ -41,7 +41,7 @@ func StockGetAllCalculatedForUserHandler(router *mux.Router, auth *negroni.Negro
 
 		log := logrus.WithField("userId", userID)
 
-		result, err := stockController.GetAllCalculated(log.Logger, userID)
+		result, err := stockController.GetAllCalculated(log, userID)
 
 		if err != nil {
 			stockHttp.HandleError(err, w)

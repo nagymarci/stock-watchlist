@@ -42,7 +42,7 @@ func NewWatchlistController(w *database.Watchlists, sc stockClient, upc userprof
 }
 
 //Create creates a new watchlist
-func (wl *WatchlistController) Create(log *logrus.Logger, request *model.WatchlistRequest) (*model.Watchlist, error) {
+func (wl *WatchlistController) Create(log *logrus.Entry, request *model.WatchlistRequest) (*model.Watchlist, error) {
 	var addedStocks []string
 
 	for _, symbol := range request.Stocks {
@@ -73,7 +73,7 @@ func (wl *WatchlistController) Create(log *logrus.Logger, request *model.Watchli
 }
 
 //Delete deletes the specified watchlist if that belongs to the authorized user
-func (wl *WatchlistController) Delete(log *logrus.Logger, id primitive.ObjectID, userID string) error {
+func (wl *WatchlistController) Delete(log *logrus.Entry, id primitive.ObjectID, userID string) error {
 	_, err := wl.getAndValidateUserAuthorization(id, userID)
 
 	if err != nil {
@@ -93,7 +93,7 @@ func (wl *WatchlistController) Delete(log *logrus.Logger, id primitive.ObjectID,
 	return nil
 }
 
-func (wl *WatchlistController) Get(log *logrus.Logger, id primitive.ObjectID, userID string) (model.Watchlist, error) {
+func (wl *WatchlistController) Get(log *logrus.Entry, id primitive.ObjectID, userID string) (model.Watchlist, error) {
 	watchlist, err := wl.getAndValidateUserAuthorization(id, userID)
 
 	if err != nil {
@@ -105,7 +105,7 @@ func (wl *WatchlistController) Get(log *logrus.Logger, id primitive.ObjectID, us
 	return watchlist, nil
 }
 
-func (wl *WatchlistController) GetAll(log *logrus.Logger, userID string) ([]model.Watchlist, error) {
+func (wl *WatchlistController) GetAll(log *logrus.Entry, userID string) ([]model.Watchlist, error) {
 	watchlists, err := wl.watchlists.GetAll(userID)
 
 	if err != nil {
@@ -117,7 +117,7 @@ func (wl *WatchlistController) GetAll(log *logrus.Logger, userID string) ([]mode
 	return watchlists, nil
 }
 
-func (wl *WatchlistController) GetCalculated(log *logrus.Logger, id primitive.ObjectID, userID string) ([]model.CalculatedStockInfo, error) {
+func (wl *WatchlistController) GetCalculated(log *logrus.Entry, id primitive.ObjectID, userID string) ([]model.CalculatedStockInfo, error) {
 	watchlist, err := wl.getAndValidateUserAuthorization(id, userID)
 
 	if err != nil {

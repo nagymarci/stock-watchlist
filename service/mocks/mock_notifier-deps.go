@@ -90,7 +90,7 @@ func (mr *MockrecommendationProviderMockRecorder) Get(id interface{}) *gomock.Ca
 }
 
 // Update mocks base method
-func (m *MockrecommendationProvider) Update(log *logrus.Logger, id primitive.ObjectID, stocks []string) error {
+func (m *MockrecommendationProvider) Update(log *logrus.Entry, id primitive.ObjectID, stocks []string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Update", log, id, stocks)
 	ret0, _ := ret[0].(error)

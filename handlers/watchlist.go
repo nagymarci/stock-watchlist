@@ -47,7 +47,7 @@ func WatchlistCreateHandler(mux *mux.Router, watchlist *controllers.WatchlistCon
 
 		watchlistRequest.UserID = userID
 
-		result, err := watchlist.Create(log.Logger, watchlistRequest)
+		result, err := watchlist.Create(log, watchlistRequest)
 
 		if err != nil {
 			message := "Watchlist creation failed: " + err.Error()
@@ -74,7 +74,7 @@ func WatchlistDeleteHandler(router *mux.Router, watchlist *controllers.Watchlist
 			return
 		}
 
-		err = watchlist.Delete(log.Logger, watchlistID, userID)
+		err = watchlist.Delete(log, watchlistID, userID)
 
 		if err != nil {
 			log.Errorln(err)
@@ -92,7 +92,7 @@ func WatchlistGetAllHandler(router *mux.Router, watchlist *controllers.Watchlist
 
 		log := logrus.WithFields(logrus.Fields{"userId": userID, "requestId": reqid.GetRequestId(r)})
 
-		result, err := watchlist.GetAll(log.Logger, userID)
+		result, err := watchlist.GetAll(log, userID)
 
 		if err != nil {
 			log.Errorln(err)
@@ -117,7 +117,7 @@ func WatchlistGetHandler(router *mux.Router, watchlist *controllers.WatchlistCon
 			return
 		}
 
-		result, err := watchlist.Get(log.Logger, watchlistID, userID)
+		result, err := watchlist.Get(log, watchlistID, userID)
 
 		if err != nil {
 			log.Errorln(err)
@@ -142,7 +142,7 @@ func WatchlistGetCalculatedHandler(router *mux.Router, watchlist *controllers.Wa
 			return
 		}
 
-		result, err := watchlist.GetCalculated(log.Logger, watchlistID, userID)
+		result, err := watchlist.GetCalculated(log, watchlistID, userID)
 
 		if err != nil {
 			log.Errorln(err)
